@@ -2,7 +2,7 @@ services:
   factorio:
     image: factoriotools/factorio:latest
     environment:
-      UPDATE_MODS_ON_START: true
+      UPDATE_MODS_ON_START: "true"
     volumes:
       - /opt/factorio:/factorio
     networks:
