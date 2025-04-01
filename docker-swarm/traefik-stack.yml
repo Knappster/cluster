@@ -1,0 +1,35 @@
+services:
+  traefik:
+    image: "traefik:3.3"
+    command:
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --entrypoints.https.http3
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json
+      - --providers.swarm=true
+      - --providers.swarm.endpoint=unix:///var/run/docker.sock
+      - --providers.swarm.network=public
+      - --providers.swarm.exposedbydefault=false
+      - --log.level=ERROR
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks:
+      - traefik_public
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/certs
+    deploy:
+      placement:
+        constraints:
+          - - node.labels.traefik.certificates == true
+
+networks:
+  traefik_public:
+    external: true
+
+volumes:
+  certs:
