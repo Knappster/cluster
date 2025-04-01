@@ -13,9 +13,9 @@ services:
           - node.labels.factorio == true
       labels:
         - traefik.enable=true
-        - "traefik.tcp.routers.factorio.entrypoints=factorio"
-        - "traefik.tcp.routers.factorio.service=factorio"
-        - "traefik.tcp.services.factorio.loadbalancer.server.port=34197"
+        - traefik.udp.routers.factorio.entrypoints=factorio
+        - traefik.udp.routers.factorio.service=factorio
+        - traefik.udp.services.factorio.loadbalancer.server.port=34197
 
 networks:
   traefik_public:
