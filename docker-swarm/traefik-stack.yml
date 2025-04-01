@@ -5,6 +5,7 @@ services:
       - --entrypoints.http.address=:80
       - --entrypoints.https.address=:443
       - --entrypoints.https.http3
+      - --entrypoints.factorio.address=:34197/udp
       - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
       - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
       - --certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json
@@ -25,7 +26,7 @@ services:
     deploy:
       placement:
         constraints:
-          - - node.labels.traefik.certificates == true
+          - node.labels.traefik.certificates == true
 
 networks:
   traefik_public:
