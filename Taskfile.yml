@@ -1,0 +1,17 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  deploy:
+    cmds:
+      - docker network create -d overlay --attachable traefik_public
+      # See: https://github.com/docker/cli/issues/1073
+      - docker compose --env-file .env -f ./docker-swarm/traefik-stack.yml config | sed '/published:/ s/"//g' | sed "/name:/d" | docker stack deploy -c - traefik
+      - docker compose --env-file .env -f ./docker-swarm/portainer-stack.yml config | sed '/published:/ s/"//g' | sed "/name:/d" | docker stack deploy -c - portainer
+
+  destroy:
+    cmds:
+      - docker stack remove portainer
+      - docker stack remove traefik
+      - docker network remove traefik_public
