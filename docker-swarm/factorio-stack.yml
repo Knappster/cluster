@@ -1,0 +1,22 @@
+services:
+  factorio:
+    image: factoriotools/factorio:latest
+    volumes:
+      - /opt/factorio:/factorio
+    networks:
+      - traefik_public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.factorio == true
+      labels:
+        - traefik.enable=true
+        - "traefik.tcp.routers.factorio.entrypoints=factorio"
+        - "traefik.tcp.routers.factorio.service=factorio"
+        - "traefik.tcp.services.factorio.loadbalancer.server.port=34197"
+
+networks:
+  traefik_public:
+    external: true
