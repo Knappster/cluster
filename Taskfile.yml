@@ -2,16 +2,71 @@
 
 version: "3"
 
+dotenv: [".env"]
+
 tasks:
+  create-public-network:
+    cmds:
+      - docker network create -d overlay --attachable traefik-public
+  remove-public-network:
+    cmds:
+      - docker network remove traefik_public
+
+  create-registry-htpasswd:
+    cmds:
+      - docker run --rm --entrypoint htpasswd registry:3 -Bbn $REGISTRY_USER $REGISTRY_PASSWORD > registry-auth/htpasswd
+      - docker config create registry-htpasswd ./registry-auth/htpasswd
+  remove-registry-htpasswd:
+    cmds:
+      - docker config rm registry-htpasswd
+
+  deploy-traefik:
+    cmds:
+      # See: https://github.com/docker/cli/issues/1073
+      - >
+        docker compose --env-file .env -f ./docker-swarm/traefik-stack.yml config
+        | sed '/published:/ s/"//g'
+        | sed "/name:/d"
+        | docker stack deploy -c - traefik
+  destroy-traefik:
+    cmds:
+      - docker stack remove traefik
+
+  deploy-portainer:
+    cmds:
+      # See: https://github.com/docker/cli/issues/1073
+      - >
+        docker compose --env-file .env -f ./docker-swarm/portainer-stack.yml config
+        | sed '/published:/ s/"//g'
+        | sed "/name:/d"
+        | docker stack deploy -c - portainer
+  destroy-portainer:
+    cmds:
+      - docker stack remove portainer
+
+  deploy-registry:
+    cmds:
+      - >
+        docker compose --env-file .env -f ./docker-swarm/registry-stack.yml config
+        | sed '/published:/ s/"//g'
+        | sed "/name:/d"
+        | docker stack deploy -c - registry
+  destroy-registry:
+    cmds:
+      - docker stack remove registry
+
   deploy:
     cmds:
-      - docker network create -d overlay --attachable traefik_public
-      # See: https://github.com/docker/cli/issues/1073
-      - docker compose --env-file .env -f ./docker-swarm/traefik-stack.yml config | sed '/published:/ s/"//g' | sed "/name:/d" | docker stack deploy -c - traefik
-      - docker compose --env-file .env -f ./docker-swarm/portainer-stack.yml config | sed '/published:/ s/"//g' | sed "/name:/d" | docker stack deploy -c - portainer
+      - task: create-public-network
+      - task: create-registry-htpasswd
+      - task: deploy-traefik
+      - task: deploy-portainer
+      - task: deploy-registry
 
   destroy:
     cmds:
-      - docker stack remove portainer
-      - docker stack remove traefik
-      - docker network remove traefik_public
+      - task: destroy-registry
+      - task: destroy-portainer
+      - task: destroy-traefik
+      - task: remove-registry-htpasswd
+      - task: remove-public-network

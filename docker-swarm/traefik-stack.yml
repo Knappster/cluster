@@ -10,7 +10,7 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json
       - --providers.swarm=true
       - --providers.swarm.endpoint=unix:///var/run/docker.sock
-      - --providers.swarm.network=traefik_public
+      - --providers.swarm.network=traefik-public
       - --providers.swarm.exposedbydefault=false
       - --log.level=ERROR
     ports:
@@ -18,7 +18,7 @@ services:
       - "443:443"
       - "34197:34197/udp"
     networks:
-      - traefik_public
+      - traefik-public
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - certs:/certs
@@ -28,7 +28,7 @@ services:
           - node.labels.traefik.certificates == true
 
 networks:
-  traefik_public:
+  traefik-public:
     external: true
 
 volumes:

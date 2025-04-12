@@ -20,8 +20,8 @@ services:
     volumes:
       - data:/data
     networks:
-      - agent_network
-      - traefik_public
+      - agent-network
+      - traefik-public
     deploy:
       mode: replicated
       replicas: 1
@@ -44,10 +44,10 @@ services:
         - traefik.http.middlewares.portainer.redirectscheme.permanent=true
 
 networks:
-  agent_network:
+  agent-network:
     driver: overlay
     attachable: true
-  traefik_public:
+  traefik-public:
     external: true
 
 volumes:

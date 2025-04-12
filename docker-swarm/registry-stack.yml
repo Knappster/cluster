@@ -1,0 +1,47 @@
+services:
+  registry:
+    image: registry:3
+    environment:
+      - REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/data
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      # For basic authentication
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
+    volumes:
+      - data:/data
+    configs:
+      - source: registry-htpasswd
+        target: /auth/htpasswd
+    networks:
+      - traefik-public
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.registry.rule=Host(`${REGISTRY_HOST}`)
+        - traefik.http.routers.registry.entrypoints=http
+        - traefik.http.routers.registry.middlewares=portainer
+        - traefik.http.routers.registry-https.rule=Host(`${REGISTRY_HOST}`)
+        - traefik.http.routers.registry-https.entrypoints=https
+        - traefik.http.routers.registry-https.service=portainer
+        - traefik.http.routers.registry-https.tls.certresolver=letsencrypt
+        - traefik.http.routers.registry-https.tls=true
+        - traefik.http.routers.registry-https.middlewares=portainer
+        - traefik.http.services.registry.loadbalancer.server.port=5000
+        - traefik.http.middlewares.registry.redirectscheme.scheme=https
+        - traefik.http.middlewares.registry.redirectscheme.permanent=true
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  traefik-public:
+    external: true
+
+volumes:
+  data:
+
+configs:
+  registry-htpasswd:
+    external: true
