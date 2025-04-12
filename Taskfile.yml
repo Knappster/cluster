@@ -14,7 +14,8 @@ tasks:
 
   create-registry-htpasswd:
     cmds:
-      - docker run --rm --entrypoint htpasswd registry:3 -Bbn $REGISTRY_USER $REGISTRY_PASSWORD > registry-auth/htpasswd
+      # https://distribution.github.io/distribution/about/deploying/#native-basic-auth
+      - docker run --rm --entrypoint htpasswd httpd:2 -Bbn $REGISTRY_USER $REGISTRY_PASSWORD > registry-auth/htpasswd
       - docker config create registry-htpasswd ./registry-auth/htpasswd
   remove-registry-htpasswd:
     cmds:
