@@ -10,7 +10,7 @@ tasks:
       - docker network create -d overlay --attachable traefik-public
   remove-public-network:
     cmds:
-      - docker network remove traefik_public
+      - docker network remove traefik-public
 
   create-registry-htpasswd:
     cmds:
