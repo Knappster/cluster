@@ -1,6 +1,6 @@
 services:
   registry:
-    image: registry:3
+    image: registry:2
     environment:
       - REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/data
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
