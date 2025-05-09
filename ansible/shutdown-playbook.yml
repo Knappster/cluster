@@ -1,0 +1,9 @@
+---
+- name: Shutdown nodes
+  hosts: nodes
+  remote_user: user
+  become: true
+  become_user: root
+  tasks:
+    - name: Shutdown
+      community.general.shutdown:

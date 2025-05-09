@@ -71,3 +71,13 @@ tasks:
       - task: destroy-traefik
       - task: remove-registry-htpasswd
       - task: remove-public-network
+
+  update:
+    cmds:
+      - sudo apt update && upgrade -y
+      - ansible-playbook -i ./ansible/hosts.yml ./ansible/update-playbook.yml
+
+  shutdown:
+    cmds:
+      - ansible-playbook -i ./ansible/hosts.yml ./ansible/shutdown-playbook.yml
+      - sudo poweroff
